@@ -2,7 +2,9 @@ import './style.css';
 
 import * as THREE from 'three';
 
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const scene = new THREE.Scene();
 
@@ -19,8 +21,7 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-camera.position.setZ(40);
-
+camera.position.setZ(30);
 
 // Created this object to text the planetMaker function
 // const arrakis = {
@@ -71,7 +72,7 @@ const earthCloudsGeometry = new THREE.SphereGeometry(10.2, 64, 64);
 const earthCloudsMaterial = new THREE.MeshStandardMaterial({
 	map: earthCloudsTexture,
 	transparent: true,
-	opacity: 0.15,
+	opacity: 0.5,
 });
 
 const earthClouds = new THREE.Mesh(earthCloudsGeometry, earthCloudsMaterial);
@@ -87,13 +88,32 @@ const moonMaterial = new THREE.MeshStandardMaterial({
 });
 
 const moon = new THREE.Mesh(moonGeometry, moonMaterial);
-moon.position.set(45, 0, 0);
+moon.position.set(40, 0, 0);
 
 scene.add(moon);
 
 // Object to control moon orbit
 const moonOrbitCenter = new THREE.Object3D();
 scene.add(moonOrbitCenter);
+
+// add ISS gltf model to the scene
+const loader = new GLTFLoader();
+let iss;
+loader.load('./textures/iss/scene.gltf', (gltf) => {
+	iss = gltf.scene;
+	iss.scale.set(0.02, 0.02, 0.02);
+	iss.position.set(1.5, 0, 10);
+
+	iss.rotateZ(1.6)
+	iss.rotateX(1.6)
+
+	scene.add(iss);
+});
+
+const issOrbitCenter = new THREE.Object3D();
+issOrbitCenter.rotateX(-0.7)
+
+scene.add(issOrbitCenter);
 
 // lighting
 const pointLight = new THREE.PointLight(0xffffff, 1.75);
@@ -107,7 +127,7 @@ scene.add(pointLight);
 
 // scene.add(lightHelper);
 
-// const controls = new OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 
 // stars
 function addStar() {
@@ -128,13 +148,15 @@ Array(200).fill().forEach(addStar);
 function animate() {
 	requestAnimationFrame(animate);
 
-	earth.rotation.y += 0.001;
-	earthClouds.rotation.y += 0.0011;
+	earth.rotation.y += 0.0001;
+	earthClouds.rotation.y += 0.00011;
 	// not sure of orbit time, need to calculate more accurately
-	moonOrbitCenter.rotation.y += 0.000037037037;
+	moonOrbitCenter.rotation.y += 0.0000037037037;
 	moonOrbitCenter.add(moon);
-	moon.rotation.y += 0.0000378;
-
+	moon.rotation.y += 0.00000378;
+// iss and orbit
+issOrbitCenter.add(iss)
+issOrbitCenter.rotation.y += 0.01
 	// controls.update();
 
 	renderer.render(scene, camera);
