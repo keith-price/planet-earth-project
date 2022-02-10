@@ -51,7 +51,7 @@ camera.position.setZ(22);
 
 // Earth
 const earthTexture = new THREE.TextureLoader().load(
-	'./textures/2k_earth_daymap.jpg'
+	'/2k_earth_daymap.jpg'
 );
 
 const earthGeometry = new THREE.SphereGeometry(10, 64, 64);
@@ -65,7 +65,7 @@ scene.add(earth);
 
 // Earth clouds sphere
 const earthCloudsTexture = new THREE.TextureLoader().load(
-	'./textures/2k_earth_clouds.jpg'
+	'2k_earth_clouds.jpg'
 );
 
 const earthCloudsGeometry = new THREE.SphereGeometry(10.2, 64, 64);
@@ -80,7 +80,7 @@ const earthClouds = new THREE.Mesh(earthCloudsGeometry, earthCloudsMaterial);
 scene.add(earthClouds);
 
 // Moon
-const moonTexture = new THREE.TextureLoader().load('./textures/2k_moon.jpg');
+const moonTexture = new THREE.TextureLoader().load('/2k_moon.jpg');
 
 const moonGeometry = new THREE.SphereGeometry(2.7, 64, 64);
 const moonMaterial = new THREE.MeshStandardMaterial({
@@ -99,7 +99,7 @@ scene.add(moonOrbitCenter);
 // add ISS gltf model to the scene
 const loader = new GLTFLoader();
 let iss;
-loader.load('./textures/iss/scene.gltf', (gltf) => {
+loader.load('/iss/scene.gltf', (gltf) => {
 	iss = gltf.scene;
 	iss.scale.set(0.02, 0.02, 0.02);
 	iss.position.set(1.5, 0, 10);
