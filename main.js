@@ -2,7 +2,7 @@ import './style.css';
 
 import * as THREE from 'three';
 
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const scene = new THREE.Scene();
 
@@ -21,6 +21,33 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 camera.position.setZ(40);
 
+
+// Created this object to text the planetMaker function
+// const arrakis = {
+// 	texture: './textures/2k_earth_daymap.jpg',
+// 	geometry: [5, 64, 64],
+// 	position: [-30, 0, 0],
+// 	name: 'arrakis',
+// };
+
+// function to create planets - function currently doesn't return anything that can be used to animate the spehere
+// const planetMaker = (planet) => {
+// 	const [a, b, c] = planet.geometry;
+// 	const [x, y, z] = planet.position;
+
+// 	const texture = new THREE.TextureLoader().load(planet['texture']);
+// 	const geometry = new THREE.SphereGeometry(a, b, c);
+// 	const material = new THREE.MeshStandardMaterial({
+// 		map: texture,
+// 	});
+
+// 	planet = new THREE.Mesh(geometry, material);
+// 	planet.position.set(x, y, z);
+// scene.add(planet)
+// };
+
+// planetMaker(arrakis);
+
 // Earth
 const earthTexture = new THREE.TextureLoader().load(
 	'./textures/2k_earth_daymap.jpg'
@@ -34,6 +61,22 @@ const earthMaterial = new THREE.MeshStandardMaterial({
 const earth = new THREE.Mesh(earthGeometry, earthMaterial);
 
 scene.add(earth);
+
+// Earth clouds sphere
+const earthCloudsTexture = new THREE.TextureLoader().load(
+	'./textures/2k_earth_clouds.jpg'
+);
+
+const earthCloudsGeometry = new THREE.SphereGeometry(10.2, 64, 64);
+const earthCloudsMaterial = new THREE.MeshStandardMaterial({
+	map: earthCloudsTexture,
+	transparent: true,
+	opacity: 0.15,
+});
+
+const earthClouds = new THREE.Mesh(earthCloudsGeometry, earthCloudsMaterial);
+
+scene.add(earthClouds);
 
 // Moon
 const moonTexture = new THREE.TextureLoader().load('./textures/2k_moon.jpg');
@@ -55,12 +98,12 @@ scene.add(moonOrbitCenter);
 // lighting
 const pointLight = new THREE.PointLight(0xffffff, 1.75);
 // const ambientLight = new THREE.AmbientLight(0xffffff);
-pointLight.position.set(500, 5, 300);
+pointLight.position.set(0, 0, 500);
 
 scene.add(pointLight);
 
 // const lightHelper = new THREE.PointLightHelper(pointLight);
-// // const gridHelper = new THREE.GridHelper(200, 50);
+// const gridHelper = new THREE.GridHelper(200, 50);
 
 // scene.add(lightHelper);
 
@@ -79,23 +122,18 @@ function addStar() {
 	scene.add(star);
 }
 
-// background
-// const spaceBackground = new THREE.TextureLoader().load(
-// 	'/textures/photo-1506318137071-a8e063b4bec0.jfif'
-// );
-// scene.background = spaceBackground;
-
 Array(200).fill().forEach(addStar);
 
 // animation
 function animate() {
 	requestAnimationFrame(animate);
-	// sphere.rotation.x += 0.01;
+
 	earth.rotation.y += 0.001;
+	earthClouds.rotation.y += 0.0011;
 	// not sure of orbit time, need to calculate more accurately
 	moonOrbitCenter.rotation.y += 0.000037037037;
 	moonOrbitCenter.add(moon);
-	moon.rotation.y += 0.000378;
+	moon.rotation.y += 0.0000378;
 
 	// controls.update();
 
