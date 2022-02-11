@@ -4,12 +4,12 @@ import * as THREE from 'three';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
-	90,
+	70,
 	window.innerWidth / window.innerHeight,
 	0.1,
 	1000
@@ -21,7 +21,7 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-camera.position.setZ(22);
+camera.position.setZ(30);
 
 // Created this object to text the planetMaker function
 // const arrakis = {
@@ -127,7 +127,7 @@ scene.add(pointLight);
 
 // scene.add(lightHelper);
 
-const controls = new OrbitControls(camera, renderer.domElement);
+// const controls = new OrbitControls(camera, renderer.domElement);
 
 // stars
 function addStar() {
@@ -156,7 +156,7 @@ function animate() {
 	moon.rotation.y += 0.00000378;
 // iss and orbit
 issOrbitCenter.add(iss)
-issOrbitCenter.rotation.y += 0.01
+issOrbitCenter.rotation.y += 0.001
 	// controls.update();
 
 	renderer.render(scene, camera);
