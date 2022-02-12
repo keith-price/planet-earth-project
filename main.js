@@ -104,14 +104,14 @@ loader.load('textures/iss/scene.gltf', (gltf) => {
 	iss.scale.set(0.02, 0.02, 0.02);
 	iss.position.set(1.5, 0, 10);
 
-	iss.rotateZ(1.6)
-	iss.rotateX(1.6)
+	iss.rotateZ(1.6);
+	iss.rotateX(1.6);
 
 	scene.add(iss);
 });
 
 const issOrbitCenter = new THREE.Object3D();
-issOrbitCenter.rotateX(-0.7)
+issOrbitCenter.rotateX(-0.7);
 
 scene.add(issOrbitCenter);
 
@@ -144,6 +144,30 @@ function addStar() {
 
 Array(200).fill().forEach(addStar);
 
+// scroll listener for camera movement
+// getting position of HTML sections
+
+
+
+const updateCameraPosition = (event) => {
+	if (window.scrollY < 800) {
+		camera.position.set(0, 0, 30)
+		
+	} else if (window.scrollY >= 800 && window.scrollY < 1800) {
+		camera.position.set(-5, 0, 20)
+		
+	} else if (window.scrollY >= 1800 && window.scrollY < 2700) {
+		camera.position.set(42, 0, 5.5)
+		
+	} else if (window.scrollY >= 2700) {
+		camera.position.set(-5, 0, 20)
+		
+	}
+	console.log(`Earth ${positionIss}, trigger ${window.scrollY}`);
+};
+
+window.addEventListener('scroll', updateCameraPosition);
+
 // animation
 function animate() {
 	requestAnimationFrame(animate);
@@ -154,9 +178,9 @@ function animate() {
 	moonOrbitCenter.rotation.y += 0.0000037037037;
 	moonOrbitCenter.add(moon);
 	moon.rotation.y += 0.00000378;
-// iss and orbit
-issOrbitCenter.add(iss)
-issOrbitCenter.rotation.y += 0.001
+	// iss and orbit
+	issOrbitCenter.add(iss);
+	issOrbitCenter.rotation.y += 0.001;
 	// controls.update();
 
 	renderer.render(scene, camera);
