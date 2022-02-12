@@ -4,12 +4,13 @@ import * as THREE from 'three';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
+
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
-	70,
+	90,
 	window.innerWidth / window.innerHeight,
 	0.1,
 	1000
@@ -23,38 +24,12 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 camera.position.setZ(30);
 
-// Created this object to text the planetMaker function
-// const arrakis = {
-// 	texture: './textures/2k_earth_daymap.jpg',
-// 	geometry: [5, 64, 64],
-// 	position: [-30, 0, 0],
-// 	name: 'arrakis',
-// };
-
-// function to create planets - function currently doesn't return anything that can be used to animate the spehere
-// const planetMaker = (planet) => {
-// 	const [a, b, c] = planet.geometry;
-// 	const [x, y, z] = planet.position;
-
-// 	const texture = new THREE.TextureLoader().load(planet['texture']);
-// 	const geometry = new THREE.SphereGeometry(a, b, c);
-// 	const material = new THREE.MeshStandardMaterial({
-// 		map: texture,
-// 	});
-
-// 	planet = new THREE.Mesh(geometry, material);
-// 	planet.position.set(x, y, z);
-// scene.add(planet)
-// };
-
-// planetMaker(arrakis);
-
 // Earth
 const earthTexture = new THREE.TextureLoader().load(
 	'/textures/2k_earth_daymap.jpg'
 );
 
-const earthGeometry = new THREE.SphereGeometry(10, 64, 64);
+const earthGeometry = new THREE.SphereGeometry(10, 256, 256);
 const earthMaterial = new THREE.MeshStandardMaterial({
 	map: earthTexture,
 });
@@ -72,7 +47,7 @@ const earthCloudsGeometry = new THREE.SphereGeometry(10.2, 64, 64);
 const earthCloudsMaterial = new THREE.MeshStandardMaterial({
 	map: earthCloudsTexture,
 	transparent: true,
-	opacity: 0.5,
+	opacity: 0.3,
 });
 
 const earthClouds = new THREE.Mesh(earthCloudsGeometry, earthCloudsMaterial);
@@ -102,12 +77,13 @@ let iss;
 loader.load('textures/iss/scene.gltf', (gltf) => {
 	iss = gltf.scene;
 	iss.scale.set(0.02, 0.02, 0.02);
-	iss.position.set(1.5, 0, 10);
+	iss.position.set(3.5, 0, 10);
 
 	iss.rotateZ(1.6);
 	iss.rotateX(1.6);
 
 	scene.add(iss);
+	console.log(iss.getWorldPosition());
 });
 
 const issOrbitCenter = new THREE.Object3D();
@@ -147,23 +123,31 @@ Array(200).fill().forEach(addStar);
 // scroll listener for camera movement
 // getting position of HTML sections
 
-
+// get position of iss
+// const cameraOffset = new Vector3(100, 10, 50)
+// const issPosition = iss.getWorldPosition(issPosition);
 
 const updateCameraPosition = (event) => {
 	if (window.scrollY < 800) {
-		camera.position.set(0, 0, 30)
 		
+		iss.remove(camera)
+		
+		camera.position.set(0, 0, 30);
 	} else if (window.scrollY >= 800 && window.scrollY < 1800) {
-		camera.position.set(-5, 0, 20)
-		
+	
+		iss.remove(camera)
+		camera.position.set(-5, 0, 20);
 	} else if (window.scrollY >= 1800 && window.scrollY < 2600) {
-		camera.position.set(42, 0, 5.5)
-		
+	
+		iss.remove(camera)
+		camera.position.set(42, 0, 5.5);
 	} else if (window.scrollY >= 2600) {
-		camera.position.set(10, 0, 5)
+		iss.add(camera);
 		
+		// camera.position.set(8, 4, -20);
+		
+		camera.position.set(10, 0, 10);
 	}
-	console.log(`Earth ${positionIss}, trigger ${window.scrollY}`);
 };
 
 window.addEventListener('scroll', updateCameraPosition);
@@ -179,10 +163,11 @@ function animate() {
 	moonOrbitCenter.add(moon);
 	moon.rotation.y += 0.00000378;
 	// iss and orbit
+	
 	issOrbitCenter.add(iss);
 	issOrbitCenter.rotation.y += 0.001;
 	// controls.update();
-
+	
 	renderer.render(scene, camera);
 }
 
