@@ -156,11 +156,11 @@ const updateCameraPosition = (event) => {
 	} else if (window.scrollY >= 800 && window.scrollY < 1800) {
 		camera.position.set(-5, 0, 20)
 		
-	} else if (window.scrollY >= 1800 && window.scrollY < 2700) {
+	} else if (window.scrollY >= 1800 && window.scrollY < 2600) {
 		camera.position.set(42, 0, 5.5)
 		
-	} else if (window.scrollY >= 2700) {
-		camera.position.set(-5, 0, 20)
+	} else if (window.scrollY >= 2600) {
+		camera.position.set(10, 0, 5)
 		
 	}
 	console.log(`Earth ${positionIss}, trigger ${window.scrollY}`);
