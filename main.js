@@ -4,25 +4,38 @@ import * as THREE from 'three';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
+let wInner = window.innerWidth;
+let wHeight = window.innerHeight;
 const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x000000, 0.011);
 
-const camera = new THREE.PerspectiveCamera(
-	90,
-	window.innerWidth / window.innerHeight,
-	0.1,
-	1000
-);
+const camera = new THREE.PerspectiveCamera(70, wInner / wHeight, 0.1, 1000);
 
 const renderer = new THREE.WebGLRenderer({
 	canvas: document.querySelector('#bg'),
 });
 
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(wInner, wHeight);
 camera.position.setZ(30);
+
+const renderScene = new RenderPass(scene, camera);
+// bloom vector (resolution, strength, radius, threshold)
+const bloomPass = new UnrealBloomPass(
+	new THREE.Vector2(wInner, wHeight),
+	0.25,
+	0,
+	0
+);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(renderScene);
+composer.addPass(bloomPass);
 
 // Earth
 const earthTexture = new THREE.TextureLoader().load(
@@ -60,6 +73,8 @@ const moonTexture = new THREE.TextureLoader().load('textures/2k_moon.jpg');
 const moonGeometry = new THREE.SphereGeometry(2.7, 64, 64);
 const moonMaterial = new THREE.MeshStandardMaterial({
 	map: moonTexture,
+	transparent: true,
+	opacity: 0.8,
 });
 
 const moon = new THREE.Mesh(moonGeometry, moonMaterial);
@@ -83,7 +98,7 @@ loader.load('textures/iss/scene.gltf', (gltf) => {
 	iss.rotateX(1.6);
 
 	scene.add(iss);
-	console.log(iss.getWorldPosition());
+	// console.log(iss.getWorldPosition());
 });
 
 const issOrbitCenter = new THREE.Object3D();
@@ -92,9 +107,9 @@ issOrbitCenter.rotateX(-0.7);
 scene.add(issOrbitCenter);
 
 // lighting
-const pointLight = new THREE.PointLight(0xffffff, 1.75);
+const pointLight = new THREE.PointLight(0xffffff, 1);
 // const ambientLight = new THREE.AmbientLight(0xffffff);
-pointLight.position.set(0, 0, 500);
+pointLight.position.set(0, 0, 250);
 
 scene.add(pointLight);
 
@@ -120,32 +135,26 @@ function addStar() {
 
 Array(200).fill().forEach(addStar);
 
-// scroll listener for camera movement
-// getting position of HTML sections
-
 // get position of iss
 // const cameraOffset = new Vector3(100, 10, 50)
 // const issPosition = iss.getWorldPosition(issPosition);
 
 const updateCameraPosition = (event) => {
 	if (window.scrollY < 800) {
-		
-		iss.remove(camera)
-		
+		iss.remove(camera);
+
 		camera.position.set(0, 0, 30);
 	} else if (window.scrollY >= 800 && window.scrollY < 1800) {
-	
-		iss.remove(camera)
+		iss.remove(camera);
 		camera.position.set(-5, 0, 20);
 	} else if (window.scrollY >= 1800 && window.scrollY < 2600) {
-	
-		iss.remove(camera)
+		iss.remove(camera);
 		camera.position.set(42, 0, 5.5);
 	} else if (window.scrollY >= 2600) {
 		iss.add(camera);
-		
+
 		// camera.position.set(8, 4, -20);
-		
+
 		camera.position.set(10, 0, 10);
 	}
 };
@@ -163,12 +172,22 @@ function animate() {
 	moonOrbitCenter.add(moon);
 	moon.rotation.y += 0.00000378;
 	// iss and orbit
-	
+
 	issOrbitCenter.add(iss);
 	issOrbitCenter.rotation.y += 0.001;
 	// controls.update();
-	
-	renderer.render(scene, camera);
+
+	composer.render(scene, camera);
 }
 
 animate();
+
+// function that dynamically sets on window resize
+const handleWindowResize = () => {
+	wInner = window.innerWidth;
+	wHeight = window.innerHeight;
+	camera.aspect = wInner / wHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+};
+window.addEventListener('resize', handleWindowResize, false);
