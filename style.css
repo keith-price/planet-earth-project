@@ -13,7 +13,7 @@
 #bg {
 	/* this is not correct, need to check how to make it fully reposnsive */
 	width: 100vw;
-	height: 100vh;
+height: 100vh;
 	display: block;
 	position: fixed;
 	top: 0;
@@ -53,3 +53,4 @@
 .section--iss {
 	justify-content: right;
 }
+

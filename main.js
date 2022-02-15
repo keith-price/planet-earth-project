@@ -9,15 +9,17 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+
 let wInner = window.innerWidth;
 let wHeight = window.innerHeight;
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x000000, 0.011);
+// scene.fog = new THREE.FogExp2(0x000000, 0.001);
 
 const camera = new THREE.PerspectiveCamera(70, wInner / wHeight, 0.1, 1000);
 
 const renderer = new THREE.WebGLRenderer({
 	canvas: document.querySelector('#bg'),
+	antialias: true,
 });
 
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -28,7 +30,7 @@ const renderScene = new RenderPass(scene, camera);
 // bloom vector (resolution, strength, radius, threshold)
 const bloomPass = new UnrealBloomPass(
 	new THREE.Vector2(wInner, wHeight),
-	0.25,
+	0.2,
 	0,
 	0
 );
@@ -39,46 +41,60 @@ composer.addPass(bloomPass);
 
 // Earth
 const earthTexture = new THREE.TextureLoader().load(
-	'/textures/2k_earth_daymap.jpg'
+	'/textures/8k_earth_daymap_ultra.jpg'
+);
+const earthNormalMap = new THREE.TextureLoader().load(
+	'./textures/8k_earth_normal_map.tif'
 );
 
 const earthGeometry = new THREE.SphereGeometry(10, 256, 256);
-const earthMaterial = new THREE.MeshStandardMaterial({
+const earthMaterial = new THREE.MeshLambertMaterial({
 	map: earthTexture,
+	normalMap: earthNormalMap,
 });
 
 const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+earth.castShadow = true;
+earth.receiveShadow = true;
 
 scene.add(earth);
 
 // Earth clouds sphere
 const earthCloudsTexture = new THREE.TextureLoader().load(
-	'textures/2k_earth_clouds.jpg'
+	'textures/8k_earth_clouds_ultra.jpg'
 );
 
-const earthCloudsGeometry = new THREE.SphereGeometry(10.2, 64, 64);
-const earthCloudsMaterial = new THREE.MeshStandardMaterial({
+const earthCloudsGeometry = new THREE.SphereGeometry(10.05, 256, 256);
+const earthCloudsMaterial = new THREE.MeshLambertMaterial({
 	map: earthCloudsTexture,
 	transparent: true,
-	opacity: 0.3,
+	opacity: 0.4,
 });
 
 const earthClouds = new THREE.Mesh(earthCloudsGeometry, earthCloudsMaterial);
+earthClouds.castShadow = true;
+earthClouds.receiveShadow = true;
 
 scene.add(earthClouds);
 
 // Moon
-const moonTexture = new THREE.TextureLoader().load('textures/2k_moon.jpg');
+const moonTexture = new THREE.TextureLoader().load(
+	'textures/Moon.Diffuse_alt.jpg'
+);
+const moonNormalMap = new THREE.TextureLoader().load(
+	'./textures/Moon.Normal_map.jpg'
+);
 
-const moonGeometry = new THREE.SphereGeometry(2.7, 64, 64);
-const moonMaterial = new THREE.MeshStandardMaterial({
+const moonGeometry = new THREE.SphereGeometry(2, 256, 256);
+const moonMaterial = new THREE.MeshLambertMaterial({
 	map: moonTexture,
-	transparent: true,
-	opacity: 0.8,
+	normalMap: moonNormalMap,
 });
 
 const moon = new THREE.Mesh(moonGeometry, moonMaterial);
 moon.position.set(40, 0, 0);
+moon.castShadow = true;
+moon.receiveShadow = true;
 
 scene.add(moon);
 
@@ -92,10 +108,12 @@ let iss;
 loader.load('textures/iss/scene.gltf', (gltf) => {
 	iss = gltf.scene;
 	iss.scale.set(0.02, 0.02, 0.02);
-	iss.position.set(3.5, 0, 10);
+	iss.position.set(2.5, 0, 10);
 
 	iss.rotateZ(1.6);
 	iss.rotateX(1.6);
+	iss.castShadow = true;
+	iss.receiveShadow = true;
 
 	scene.add(iss);
 	// console.log(iss.getWorldPosition());
@@ -107,9 +125,10 @@ issOrbitCenter.rotateX(-0.7);
 scene.add(issOrbitCenter);
 
 // lighting
-const pointLight = new THREE.PointLight(0xffffff, 1);
-// const ambientLight = new THREE.AmbientLight(0xffffff);
-pointLight.position.set(0, 0, 250);
+const pointLight = new THREE.PointLight(0xfff5f2, 1.3);
+
+pointLight.position.set(-10, 0, 250);
+pointLight.castShadow = true;
 
 scene.add(pointLight);
 
@@ -123,7 +142,7 @@ scene.add(pointLight);
 // stars
 function addStar() {
 	const starGeometry = new THREE.SphereGeometry(0.25, 24, 25);
-	const starMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+	const starMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
 	const star = new THREE.Mesh(starGeometry, starMaterial);
 
 	const [x, y, z] = Array(3)
@@ -141,19 +160,17 @@ Array(200).fill().forEach(addStar);
 
 const updateCameraPosition = (event) => {
 	if (window.scrollY < 800) {
-		iss.remove(camera);
-
+		moonOrbitCenter.remove(camera);
 		camera.position.set(0, 0, 30);
 	} else if (window.scrollY >= 800 && window.scrollY < 1800) {
-		iss.remove(camera);
+		// attach to moonOrbitCenter in order to see the Earth rotate, if attach to Earth then we don't see the rotation
+		moonOrbitCenter.add(camera);
 		camera.position.set(-5, 0, 20);
-	} else if (window.scrollY >= 1800 && window.scrollY < 2600) {
-		iss.remove(camera);
-		camera.position.set(42, 0, 5.5);
-	} else if (window.scrollY >= 2600) {
+	} else if (window.scrollY >= 1800 && window.scrollY < 2750) {
+		moon.add(camera);
+		camera.position.set(2, 0, 5);
+	} else if (window.scrollY >= 2750) {
 		iss.add(camera);
-
-		// camera.position.set(8, 4, -20);
 
 		camera.position.set(10, 0, 10);
 	}
@@ -175,6 +192,7 @@ function animate() {
 
 	issOrbitCenter.add(iss);
 	issOrbitCenter.rotation.y += 0.001;
+
 	// controls.update();
 
 	composer.render(scene, camera);
