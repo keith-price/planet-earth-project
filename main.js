@@ -13,7 +13,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 let wInner = window.innerWidth;
 let wHeight = window.innerHeight;
 const scene = new THREE.Scene();
-// scene.fog = new THREE.FogExp2(0x000000, 0.001);
+// scene.fog = new THREE.FogExp2(0x000000, 0.0011);
 
 const camera = new THREE.PerspectiveCamera(70, wInner / wHeight, 0.1, 1000);
 
@@ -30,7 +30,7 @@ const renderScene = new RenderPass(scene, camera);
 // bloom vector (resolution, strength, radius, threshold)
 const bloomPass = new UnrealBloomPass(
 	new THREE.Vector2(wInner, wHeight),
-	0.2,
+	0.17,
 	0,
 	0
 );
@@ -61,7 +61,7 @@ scene.add(earth);
 
 // Earth clouds sphere
 const earthCloudsTexture = new THREE.TextureLoader().load(
-	'textures/8k_earth_clouds_ultra.jpg'
+	'textures/fair_clouds_8k.jpg'
 );
 
 const earthCloudsGeometry = new THREE.SphereGeometry(10.05, 256, 256);
@@ -125,14 +125,18 @@ issOrbitCenter.rotateX(-0.7);
 scene.add(issOrbitCenter);
 
 // lighting
-const pointLight = new THREE.PointLight(0xfff5f2, 1.3);
+const pointLight = new THREE.PointLight(0xfff5f2, 1.5);
 
 pointLight.position.set(-10, 0, 250);
 pointLight.castShadow = true;
 
-scene.add(pointLight);
+const ambientLight = new THREE.AmbientLight(0xadd8e6, 0.03);
+ambientLight.position.set(0, 0, 0);
 
-// const lightHelper = new THREE.PointLightHelper(pointLight);
+scene.add(pointLight, ambientLight);
+
+const lightHelper = new THREE.PointLightHelper(pointLight);
+
 // const gridHelper = new THREE.GridHelper(200, 50);
 
 // scene.add(lightHelper);
@@ -172,7 +176,7 @@ const updateCameraPosition = (event) => {
 	} else if (window.scrollY >= 2750) {
 		iss.add(camera);
 
-		camera.position.set(10, 0, 10);
+		camera.position.set(11, 0, 10);
 	}
 };
 
@@ -206,6 +210,7 @@ const handleWindowResize = () => {
 	wHeight = window.innerHeight;
 	camera.aspect = wInner / wHeight;
 	camera.updateProjectionMatrix();
+
 	renderer.setSize(window.innerWidth, window.innerHeight);
 };
 window.addEventListener('resize', handleWindowResize, false);
