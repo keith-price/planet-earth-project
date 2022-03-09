@@ -9,23 +9,26 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 // import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { AmbientLight } from 'three';
+import { DoubleSide } from 'three';
 // import { PointLight } from 'three';
 
 let wInner = window.innerWidth;
 let wHeight = window.innerHeight;
 const scene = new THREE.Scene();
-// scene.fog = new THREE.FogExp2(0x000000, 0.0011);
+// scene.fog = new THREE.FogExp2(0xffffff, 0.00001);
 
 const camera = new THREE.PerspectiveCamera(45, wInner / wHeight, 0.1, 1000);
 
 const renderer = new THREE.WebGLRenderer({
 	canvas: document.querySelector('#bg'),
+	alpha: true,
 	antialias: true,
 });
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(wInner, wHeight);
-camera.position.set(0, 0, 140);
+camera.position.set(0, 40, 100);
 
 const renderScene = new RenderPass(scene, camera);
 // bloom vector (resolution, strength, radius, threshold)
@@ -70,7 +73,7 @@ const mercuryMaterial = new THREE.MeshLambertMaterial({
 const mercury = new THREE.Mesh(mercuryGeometry, mercuryMaterial);
 mercury.castShadow = true;
 mercury.receiveShadow = true;
-mercury.position.set(8, 0, 0);
+mercury.position.set(9, 0, 0);
 scene.add(mercury);
 
 const mercuryOrbitCenter = new THREE.Object3D();
@@ -82,7 +85,6 @@ const venusTexture = new THREE.TextureLoader().load(
 	'/textures/2k_venus_surface.jpg'
 );
 
-
 const venusGeometry = new THREE.SphereGeometry(1, 64, 64);
 const venusMaterial = new THREE.MeshLambertMaterial({
 	map: venusTexture,
@@ -91,7 +93,7 @@ const venusMaterial = new THREE.MeshLambertMaterial({
 const venus = new THREE.Mesh(venusGeometry, venusMaterial);
 venus.castShadow = true;
 venus.receiveShadow = true;
-venus.position.set(12, 0, 0);
+venus.position.set(13, 0, 0);
 scene.add(venus);
 
 const venusOrbitCenter = new THREE.Object3D();
@@ -211,7 +213,7 @@ const jupiterMaterial = new THREE.MeshLambertMaterial({
 });
 
 const jupiter = new THREE.Mesh(jupiterGeometry, jupiterMaterial);
-jupiter.position.set(50, 0, 0);
+jupiter.position.set(38, 0, 0);
 jupiter.castShadow = true;
 jupiter.receiveShadow = true;
 scene.add(jupiter);
@@ -229,7 +231,7 @@ const saturnMaterial = new THREE.MeshLambertMaterial({
 });
 
 const saturn = new THREE.Mesh(saturnGeometry, saturnMaterial);
-saturn.position.set(70, 0, 0);
+saturn.position.set(48, 0, 0);
 saturn.castShadow = true;
 saturn.receiveShadow = true;
 scene.add(saturn);
@@ -237,6 +239,38 @@ scene.add(saturn);
 const saturnOrbitCenter = new THREE.Object3D();
 saturnOrbitCenter.position.set(0, 0, 0);
 scene.add(saturnOrbitCenter);
+
+// saturn's rings
+const saturnRingsTexture = new THREE.TextureLoader().load(
+	'/textures/2k_saturn_ring_alpha.jpg',
+	
+);
+
+const saturnsRingsGeometry = new THREE.RingBufferGeometry(3, 5, 64);
+var pos = saturnsRingsGeometry.attributes.position;
+var v3 = new THREE.Vector3();
+for (let i = 0; i < pos.count; i++){
+    v3.fromBufferAttribute(pos, i);
+    saturnsRingsGeometry.attributes.uv.setXY(i, v3.length() < 4 ? 0 : 1, 1);
+}
+
+// const saturnRingsGeometry = new THREE.RingGeometry(2.5, 3.5, 64);
+const saturnRingsMaterial = new THREE.MeshLambertMaterial({
+	side: THREE.DoubleSide,
+	map: saturnRingsTexture,
+	
+});
+
+const saturnsRings = new THREE.Mesh(saturnsRingsGeometry, saturnRingsMaterial);
+saturnsRings.position.set(48, 0, 0);
+saturnsRings.rotateX(4.7);
+saturnsRings.castShadow = true;
+saturnsRings.receiveShadow = true;
+scene.add(saturnsRings);
+
+// const saturnsRingsOrbitCenter = new THREE.Object3D();
+// saturnsRingsOrbitCenter.position.set(48, 0, 0);
+// scene.add(saturnsRingsOrbitCenter);
 
 // uranus
 const uranusTexture = new THREE.TextureLoader().load('/textures/2k_uranus.jpg');
@@ -247,7 +281,7 @@ const uranusMaterial = new THREE.MeshLambertMaterial({
 });
 
 const uranus = new THREE.Mesh(uranusGeometry, uranusMaterial);
-uranus.position.set(90, 0, 0);
+uranus.position.set(58, 0, 0);
 uranus.castShadow = true;
 uranus.receiveShadow = true;
 scene.add(uranus);
@@ -267,7 +301,7 @@ const neptuneMaterial = new THREE.MeshLambertMaterial({
 });
 
 const neptune = new THREE.Mesh(neptuneGeometry, neptuneMaterial);
-neptune.position.set(110, 0, 0);
+neptune.position.set(68, 0, 0);
 neptune.castShadow = true;
 neptune.receiveShadow = true;
 scene.add(neptune);
@@ -277,15 +311,15 @@ neptuneOrbitCenter.position.set(0, 0, 0);
 scene.add(neptuneOrbitCenter);
 
 // lighting
-const pointLight = new THREE.PointLight(0xffffff, 1.5);
+const pointLight = new THREE.PointLight(0xffffff, 1.1);
 
 pointLight.position.set(0, 0, 0);
 pointLight.castShadow = true;
 
-// const ambientLight = new THREE.AmbientLight(0xfff5f2, 1);
-// ambientLight.position.set(0, 0, 0);
+const ambientLight = new THREE.AmbientLight(0xffffff, .1);
+ambientLight.position.set(0, 50, 0);
 
-scene.add(pointLight);
+scene.add(pointLight, ambientLight);
 
 // const lightHelper = new THREE.PointLightHelper(pointLight);
 
@@ -296,19 +330,19 @@ scene.add(pointLight);
 const controls = new OrbitControls(camera, renderer.domElement);
 
 // stars
-function addStar() {
-	const starGeometry = new THREE.SphereGeometry(0.25, 24, 25);
-	const starMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
-	const star = new THREE.Mesh(starGeometry, starMaterial);
+// function addStar() {
+// 	const starGeometry = new THREE.SphereGeometry(0.25, 24, 25);
+// 	const starMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+// 	const star = new THREE.Mesh(starGeometry, starMaterial);
 
-	const [x, y, z] = Array(3)
-		.fill()
-		.map(() => THREE.MathUtils.randFloatSpread(1000));
-	star.position.set(x, y, z);
-	scene.add(star);
-}
+// 	const [x, y, z] = Array(3)
+// 		.fill()
+// 		.map(() => THREE.MathUtils.randFloatSpread(1000));
+// 	star.position.set(x, y, z);
+// 	scene.add(star);
+// }
 
-Array(200).fill().forEach(addStar);
+// Array(200).fill().forEach(addStar);
 
 // get position of iss
 // const cameraOffset = new Vector3(100, 10, 50)
@@ -378,9 +412,12 @@ function animate() {
 	jupiter.rotation.y += 0.05;
 
 	// saturn
-	saturnOrbitCenter.add(saturn);
+	saturnOrbitCenter.add(saturn, saturnsRings);
 	saturnOrbitCenter.rotation.y += 0.0003;
 	saturn.rotation.y += 0.03;
+	saturnsRings.rotation.z += 0.04;
+
+	// saturn's rings
 
 	// uranus
 	uranusOrbitCenter.add(uranus);
