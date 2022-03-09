@@ -242,23 +242,21 @@ scene.add(saturnOrbitCenter);
 
 // saturn's rings
 const saturnRingsTexture = new THREE.TextureLoader().load(
-	'/textures/2k_saturn_ring_alpha.jpg',
-	
+	'/textures/2k_saturn_ring_alpha.jpg'
 );
 
 const saturnsRingsGeometry = new THREE.RingBufferGeometry(3, 5, 64);
 var pos = saturnsRingsGeometry.attributes.position;
 var v3 = new THREE.Vector3();
-for (let i = 0; i < pos.count; i++){
-    v3.fromBufferAttribute(pos, i);
-    saturnsRingsGeometry.attributes.uv.setXY(i, v3.length() < 4 ? 0 : 1, 1);
+for (let i = 0; i < pos.count; i++) {
+	v3.fromBufferAttribute(pos, i);
+	saturnsRingsGeometry.attributes.uv.setXY(i, v3.length() < 4 ? 0 : 1, 1);
 }
 
 // const saturnRingsGeometry = new THREE.RingGeometry(2.5, 3.5, 64);
 const saturnRingsMaterial = new THREE.MeshLambertMaterial({
 	side: THREE.DoubleSide,
 	map: saturnRingsTexture,
-	
 });
 
 const saturnsRings = new THREE.Mesh(saturnsRingsGeometry, saturnRingsMaterial);
@@ -267,10 +265,6 @@ saturnsRings.rotateX(4.7);
 saturnsRings.castShadow = true;
 saturnsRings.receiveShadow = true;
 scene.add(saturnsRings);
-
-// const saturnsRingsOrbitCenter = new THREE.Object3D();
-// saturnsRingsOrbitCenter.position.set(48, 0, 0);
-// scene.add(saturnsRingsOrbitCenter);
 
 // uranus
 const uranusTexture = new THREE.TextureLoader().load('/textures/2k_uranus.jpg');
@@ -311,17 +305,24 @@ neptuneOrbitCenter.position.set(0, 0, 0);
 scene.add(neptuneOrbitCenter);
 
 // lighting
-const pointLight = new THREE.PointLight(0xffffff, 1.1);
+const sunLight = new THREE.PointLight(0xffffff, 1.1);
+// const ringLight = new THREE.PointLight(0xffffff, 1.1, 20, 3)
 
-pointLight.position.set(0, 0, 0);
-pointLight.castShadow = true;
+// light indside sun
+sunLight.position.set(0, 0, 0);
+sunLight.castShadow = true;
 
-const ambientLight = new THREE.AmbientLight(0xffffff, .1);
+// use a directional light or a spotlight for this - pointlight radiates in all directions
+// light to simulate reflection of sunlight off suturn onto the rings
+// ringLight.position.set(46, 10, 0)
+// ringLight.lookAt(saturnOrbitCenter)
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
 ambientLight.position.set(0, 50, 0);
 
-scene.add(pointLight, ambientLight);
+scene.add(sunLight, ambientLight);
 
-// const lightHelper = new THREE.PointLightHelper(pointLight);
+// const lightHelper = new THREE.PointLightHelper(ringLight);
 
 // const gridHelper = new THREE.GridHelper(200, 50);
 
@@ -403,7 +404,7 @@ function animate() {
 
 	// mars
 	marsOrbitCenter.add(mars);
-	marsOrbitCenter.rotation.y += 0.0005;
+	marsOrbitCenter.rotation.y += 0.0009;
 	mars.rotation.y += 0.01;
 
 	// jupiter
